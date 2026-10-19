@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>翻譯引擎與設定 · 雙語伴讀</title>
+  <link rel="stylesheet" href="setup.css">
+  <script type="module" src="setup.js"></script>
+</head>
+<body>
+  <header class="brand"><img src="icons/48.png" alt="" width="38" height="38"><div><strong>雙語伴讀</strong><span>原文留著，理解跟上。</span></div><span id="active-engine" class="local-tag">目前使用本機翻譯</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">翻譯引擎與設定</p><h1>讀原文，<br>也讀懂言外之意。</h1><p>外語網頁自動接上繁體中文。選好引擎後，<br>你只需要繼續閱讀。</p></section>
+    <section class="engine-section" aria-labelledby="engine-heading">
+      <div class="section-head"><span class="step-number" aria-hidden="true">01</span><div><h2 id="engine-heading">選擇翻譯引擎</h2><p>預設保留本機翻譯。儲存 AI 金鑰並同意傳送文字後，才會啟用雲端 AI。</p></div></div>
+      <fieldset class="engine-picker"><legend class="sr-only">翻譯引擎</legend>
+        <label class="engine-choice"><input type="radio" name="engine" value="gemini"><span><strong>Gemini</strong><small>免費額度優先</small></span><span class="recommended-label">建議</span></label>
+        <label class="engine-choice"><input type="radio" name="engine" value="deepseek"><span><strong>DeepSeek</strong><small>依 API 用量計費</small></span></label>
+        <label class="engine-choice"><input type="radio" name="engine" value="local"><span><strong>Chrome 本機</strong><small>離線使用・完全免費</small></span></label>
+      </fieldset>
+      <section id="ai-settings" class="ai-settings" aria-labelledby="ai-heading">
+        <div class="provider-intro"><h3 id="ai-heading">使用自己的 Gemini 金鑰</h3><a id="key-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">取得 API 金鑰 ↗</a></div>
+        <p id="provider-description" class="helper">不需訂閱雙語伴讀。Gemini 提供免費額度，實際可用額度依你的帳號與地區而定。</p>
+        <div class="form-field"><label for="ai-model">翻譯模型</label><select id="ai-model"><option value="gemini-3.8-flash">Gemini 3.8 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option></select></div>
+        <div class="form-field"><label for="api-key">API 金鑰 <span id="key-state">尚未設定</span></label><div class="key-input"><input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="只在這台 Chrome 儲存" aria-describedby="key-help"><button id="toggle-key" type="button" aria-label="顯示輸入的金鑰" aria-pressed="false">顯示</button></div><p id="key-help" class="helper">每個人使用自己的金鑰。金鑰不會寫進公開專案，也不會顯示在網頁上。</p></div>
+        <div class="test-row"><button id="test-ai" type="button" class="secondary">測試 AI 翻譯</button><span>只傳送固定範例，不會讀取你的網頁。</span></div>
+        <section id="ai-test-result" class="status" aria-live="polite" aria-atomic="true" hidden><strong id="ai-test-title"></strong><p id="ai-test-detail"></p></section>
+        <div class="cloud-note"><label class="consent"><input id="cloud-consent" type="checkbox"><span>啟用自動 AI 翻譯時，我同意將需要翻譯的網頁文字傳送給 <strong id="consent-provider">Google Gemini</strong>。</span></label><p id="billing-note">免費額度有速度與用量限制；Google 免費服務可能使用提交內容改善產品。若你的 API 專案已開啟計費，會依帳號方案收費。本擴充功能不會替你開啟計費。</p><a id="pricing-link" href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener noreferrer">查看官方額度與資料使用說明 ↗</a></div>
+        <div class="save-row"><button id="save-ai" type="button" class="primary">儲存並啟用 Gemini <span aria-hidden="true">→</span></button><button id="remove-key" type="button" class="text-button" hidden>刪除已儲存金鑰</button></div><p id="remove-key-note" class="helper" hidden>刪除金鑰會切回本機翻譯。</p>
+      </section>
+      <section id="native-settings" class="native-settings" hidden>
+        <div class="native-heading"><div><h3>Chrome 內建翻譯</h3><p class="helper">文字留在這台電腦，不需帳號或 API 金鑰。一般文章可用，語氣與長句較適合用 AI 判讀。</p></div><button id="save-local" type="button" class="secondary">使用本機翻譯</button></div>
+        <section class="prepare-section" aria-labelledby="prepare-heading">
+          <h3 id="prepare-heading">準備你會閱讀的語言</h3><p class="helper">第一次保持連網，讓 Chrome 下載模型；每種語言只需準備一次。</p>
+          <div class="language recommended"><div><h3>英文 → 繁體中文</h3><p id="language-state-en">大多數英文網站都用得到。</p></div><button type="button" class="primary prepare-button" data-source="en">準備英文翻譯 <span aria-hidden="true">↗</span></button></div>
+          <section id="progress-box" class="status" aria-live="polite" aria-atomic="true" hidden><strong id="progress-title">正在準備語言模型…</strong><p id="progress-detail">請保持連網，完成後會自動儲存。</p><progress id="download" max="1" aria-label="語言模型下載進度"></progress></section>
+          <details class="other-languages"><summary>準備其他語言</summary><div class="language-row"><span>日文 → 繁體中文</span><button type="button" class="secondary prepare-button" data-source="ja">準備日文</button></div><div class="language-row"><span>韓文 → 繁體中文</span><button type="button" class="secondary prepare-button" data-source="ko">準備韓文</button></div><div class="language-row"><span>簡體中文 → 繁體中文</span><button type="button" class="secondary prepare-button" data-source="zh">準備簡中</button></div><div class="language-row more-row"><label class="sr-only" for="more-source">其他原文語言</label><select id="more-source"><option value="fr">法文 → 繁體中文</option><option value="de">德文 → 繁體中文</option><option value="es">西班牙文 → 繁體中文</option><option value="pt">葡萄牙文 → 繁體中文</option><option value="ru">俄文 → 繁體中文</option><option value="vi">越南文 → 繁體中文</option><option value="th">泰文 → 繁體中文</option></select><button id="prepare-more" type="button" class="secondary prepare-button">準備這個語言</button></div></details>
+        </section>
+        <section id="success-box" class="success" aria-live="polite" hidden><span class="success-mark" aria-hidden="true">✓</span><div><h2 id="success-title">準備完成，開始閱讀。</h2><p id="success-detail">現在可以關閉這頁，之後開英文網頁會自動雙語。</p><p id="paused-note" hidden>你已關閉自動翻譯。請點工具列上的伴讀圖示，開啟「自動雙語翻譯」。</p></div></section>
+      </section>
+      <section id="ai-save-result" class="status" aria-live="polite" aria-atomic="true" hidden><strong id="ai-save-title"></strong><p id="ai-save-detail"></p></section>
+    </section>
+    <section class="after-setup"><div class="section-head"><span class="step-number" aria-hidden="true">02</span><div><h2>開一篇外語文章，就能開始。</h2><p>不用開著側欄。譯文直接接在原文下方，捲動時繼續翻譯。想調整或暫停，點 Chrome 工具列上的伴讀圖示即可。</p><p>新引擎會套用到新開或重新整理的網頁。已開著的頁面，請按「重新翻譯這頁」。</p></div></div></section>
+    <p class="support-note">適用一般 HTTP／HTTPS 網頁。Chrome 內部頁面、擴充功能商店、PDF 閱讀器及圖片裡的文字不支援。繁體中文頁面保留原文。</p>
+  </main>
+  <footer><span>雙語伴讀 · 自己選擇翻譯引擎</span><span>程式免訂閱；雲端 API 依供應商額度與方案。</span></footer>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "version": "3.0.0",
+  "date": "2026-10-19",
+  "allBrowserTestsHeadless": true,
+  "unit": {
+    "passed": 19,
+    "command": "npm test"
+  },
+  "cloudIntegration": {
+    "passed": 16,
+    "liveAPI": false,
+    "checks": [
+      "Existing native mode is retained until the reader saves their own cloud configuration",
+      "Cloud activation requires explicit consent and a key",
+      "Connection test uses a fixed sample and does not save the temporary key",
+      "Saving AI settings leaves previously open pages paused and exposes only hasKey metadata",
+      "New webpages automatically insert cloud translations without opening popup or setup",
+      "Content scripts cannot read the trusted-only credential store",
+      "API keys travel in headers and never in request URLs or content messages",
+      "Actual Chrome action popup naturally measures 360px, with horizontal title and no width collapse",
+      "Hash navigation keeps the same cloud session and translates newly added content",
+      "Trusted-storage preference relay stops cloud calls immediately and resumes existing pages",
+      "Restore cancels an in-flight cloud request and prevents late DOM insertion",
+      "Navigating away rejects queued requests from the departed document",
+      "DeepSeek optional provider uses its own fixed endpoint and model",
+      "Quota failure stops additional requests for that page; no paid fallback or retry loop",
+      "Native mode remains selectable without a subscription or API call",
+      "No uncaught extension page errors"
+    ],
+    "popup": {
+      "innerWidth": 360,
+      "innerHeight": 475,
+      "width": 360,
+      "bodyWidth": 360,
+      "titleWidth": 102.203125,
+      "titleHeight": 23.796875
+    }
+  },
+  "nativeIntegration": {
+    "passed": 16,
+    "realChromeLocalModel": true,
+    "checks": [
+      "One-time setup prepares the real native English→Traditional Chinese model",
+      "New webpage automatically shows actual bilingual text with all settings/popup pages closed and no toolbar click",
+      "A hidden offscreen engine runs without a visible sidebar or tab",
+      "Dynamically inserted text translates automatically while browser network is offline",
+      "A second tab automatically translates without any extension interaction",
+      "Same-document navigation keeps automatic dynamic translation active",
+      "Toolbar restore pauses one document; retry resumes automatic translation",
+      "Global switch restores existing pages, disables new pages, and resumes when enabled",
+      "Per-site pause persists across navigation and resumes automatically when re-enabled",
+      "Traditional Chinese pages remain unchanged",
+      "An unprepared language shows a toolbar notice without opening any window",
+      "Long article scroll lazily translates newly visible paragraphs",
+      "Changed source text receives an updated automatic translation",
+      "Compact toolbar popup fits 360px in light and dark mode",
+      "After a full Chrome restart, the prepared language translates automatically without setup or clicks",
+      "No uncaught page errors"
+    ],
+    "restartHarnessReloadsEphemeralTestExtension": true
+  },
+  "ui": {
+    "passed": 13,
+    "liveAPI": false
+  },
+  "qualityNote": "雲端整合採模擬回覆，未使用真實 API 金鑰做線上品質評測。本機品質試讀另見翻譯品質試讀.html。"
+}

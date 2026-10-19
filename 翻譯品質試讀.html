@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>雙語伴讀｜翻譯品質試讀</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f4ef;color:#202b30;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.75}main{max-width:900px;margin:auto;padding:44px 24px 64px}.eyebrow{font-size:13px;letter-spacing:.12em;font-weight:700;color:#47685d;margin:0 0 10px}h1{font-size:clamp(27px,5vw,38px);line-height:1.35;margin:0 0 18px;letter-spacing:-.025em}.lead{font-size:18px;max-width:760px;margin:0 0 18px}.meta,.limits{font-size:14px;color:#576169}.meta{padding-bottom:24px;border-bottom:1px solid #d8ddd7;margin-bottom:24px}.callout{background:#e7eee8;border-left:4px solid #527665;border-radius:3px;padding:16px 20px;margin-bottom:28px}.callout p{margin:0}.case{background:#fff;border:1px solid #dfe3dc;border-radius:12px;padding:25px 28px;margin:0 0 20px;box-shadow:0 2px 7px #233b2d04}.case-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}h2{font-size:20px;line-height:1.4;margin:0;display:flex;gap:12px;align-items:baseline}h2 span{font-size:15px;color:#62756b;font-variant-numeric:tabular-nums}h3{font-size:12px;letter-spacing:.05em;color:#6a747b;margin:0 0 6px;font-weight:700}section+section{margin-top:17px}section p{font-size:16px;margin:0;overflow-wrap:anywhere}.source{color:#47535a;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.7}.translated{background:#f3f7f3;padding:13px 16px;border-radius:6px}.review p{font-size:14px;color:#4c585f}.badge{white-space:nowrap;font-size:12px;line-height:1.6;margin:1px 0 0;border-radius:4px;padding:3px 8px}.good{background:#e8f2ea;color:#355d42}.mixed{background:#f8f0d8;color:#7e631f}.weak{background:#f8e7df;color:#924628}.limits{border-top:1px solid #d8ddd7;margin-top:32px;padding-top:24px}.limits p{margin:0 0 12px}a{color:#345f50;text-underline-offset:3px}@media(max-width:620px){main{padding:28px 16px 42px}.case{padding:20px 18px}.case-head{display:block}.badge{display:inline-block;margin:11px 0 0 27px}.lead{font-size:17px}.translated{padding:12px}h2{font-size:19px}}
+</style></head><body><main>
+<p class="eyebrow">雙語伴讀 · 真實引擎試讀</p>
+<h1>一般句子能讀懂，<br>反諷與專業措辭仍有落差。</h1>
+<p class="lead">本次實際翻譯 6 句英文：否定、長句、日期與條件大致保留；AI 術語偏直譯，反諷句則出現明顯不自然的表達。</p>
+<p class="meta">測試日期：2026 年 10 月 19 日 · Chrome 155.0.8059.82<br>英文 → 繁體中文 · Chrome 本機 Translator API · 隔離的無視窗測試環境</p>
+<div class="callout"><p>下面的譯文均由實際 Chrome 引擎產生，保留原始輸出。判讀是針對這 6 句的人工檢視；沒有另外呼叫付費 AI，也沒有虛構其他引擎的比較結果。</p></div>
+<article class="case">
+  <div class="case-head"><h2><span>1</span>雙重否定與程度</h2><p class="badge good">語意保留</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">The improvement was not insignificant, but it was nowhere near enough to justify doubling the price.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>改進並非微不足道，但遠遠不足以證明價格翻倍的合理性。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>「並非微不足道」保留了雙重否定；「遠遠不足」與「價格翻倍」也正確。整句可理解，但「證明價格翻倍的合理性」偏書面、直譯。</p></section>
+</article>
+<article class="case">
+  <div class="case-head"><h2><span>2</span>條件、例外與否定</h2><p class="badge good">條件與否定保留</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">Do not enable automatic renewal unless your administrator has explicitly approved it; cancelling the trial does not delete your data.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>除非您的管理員明確批准，否則不要啟用自動續訂； 取消試用不會刪除您的資料。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>保留了「除非管理員明確批准，否則不要啟用」的條件，也沒有把「取消試用不會刪資料」翻反。這一句的關鍵操作限制可讀。</p></section>
+</article>
+<article class="case">
+  <div class="case-head"><h2><span>3</span>長句、多子句與比較</h2><p class="badge mixed">長句主旨保留，措辭生硬</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">The model that the team released last week, which had been trained on a much smaller dataset than its predecessor, outperformed the older version on retrieval tasks but fell behind when the instructions were ambiguous.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>該團隊上週發布的模型在比其前身小得多的數據集上進行了培訓，在檢索任務方面的表現優於舊版本，但在指令模棱兩可時落後。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>上週發布、訓練資料較少、檢索表現較好、指令含糊時落後等關係都保留了。繁中用詞有「數據集」「培訓」，在台灣 AI 技術文章常會改成「資料集」「訓練」；句子也略顯擁擠。</p></section>
+</article>
+<article class="case">
+  <div class="case-head"><h2><span>4</span>AI 專業術語與事實界線</h2><p class="badge mixed">術語與動詞需判讀</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">In retrieval-augmented generation, the agent should cite the retrieved source rather than present its own guess as an established fact.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>在檢索增強生成中，代理人應該引用檢索到的來源，而不是將自己的猜測視為既定事實。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>保留了引用來源與區分猜測、事實的主旨。AI 語境的 agent 譯成「代理人」比較生硬；present ... as 指「把猜測當成事實來呈現」，譯成「視為」也有語意細微差異。本次沒有設定自訂術語表。</p></section>
+</article>
+<article class="case">
+  <div class="case-head"><h2><span>5</span>反諷語氣</h2><p class="badge weak">反諷與慣用語表達失真</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">Great, another mandatory meeting that could have been an email.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>太好了，另一個可能是一封電子郵件的強制性會議。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>could have been an email 在這裡抱怨「明明寄封電子郵件就能講完，卻又要開會」。實譯「可能是一封電子郵件的強制性會議」不自然，也弱化了「Great」的反諷。這是本次最明顯的品質問題。</p></section>
+</article>
+<article class="case">
+  <div class="case-head"><h2><span>6</span>日期、數字與退款條件</h2><p class="badge good">日期與退款條件保留</p></div>
+  <section><h3>英文原文</h3><p lang="en" class="source">The deadline was moved from March 15 to May 13. Only users who cancel before May 12 are eligible for a full refund.</p></section>
+  <section class="translated"><h3>Chrome 本機實際譯文</h3><p>截止日期從 3 月 15 日移至 5 月 13 日。只有在 5 月 12 日之前取消的用戶才有資格獲得全額退款。</p></section>
+  <section class="review"><h3>語意判讀</h3><p>3 月 15 日、5 月 13 日與 5 月 12 日均保留；「只有」「之前」「全額退款」的限制也沒有漏掉。本句數字與資格條件可讀。</p></section>
+</article>
+<footer class="limits"><p><strong>這次能說什麼：</strong>免費本機翻譯可以作為一般英文閱讀的起點，但不能據此保證每篇文章、專業內容或語氣都準確。是否適合取代原本服務，應以你常讀的內容試用後判斷。</p>
+<p><strong>這次沒有測什麼：</strong>其他語言、整篇文章的跨段指代、術語一致性，以及與沉浸式翻譯或其他 AI 引擎的同條件比較。這是 6 句質性抽查，沒有推算精確品質分數。</p>
+<p><strong>方法：</strong>以獨立測試設定檔啟動 headless Chrome，載入目前擴充功能並準備英文語言模型，在同一擴充功能來源呼叫原生 Translator.translate。沒有使用你平常的 Chrome 設定檔，也沒有開啟可見視窗。六句均短於擴充功能的分段門檻。</p>
+<p>引擎與繁體中文支援說明：<a href="https://developer.chrome.com/docs/ai/translator-api">Chrome 官方 Translator API 文件</a>。官方文件描述本機專用翻譯模型，沒有提供它與其他付費翻譯引擎的同條件品質保證。</p></footer>
+</main></body></html>

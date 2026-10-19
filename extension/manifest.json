@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "雙語伴讀",
+  "version": "3.0.0",
+  "description": "網頁自動雙語閱讀，支援 Gemini、DeepSeek 自備金鑰與 Chrome 本機翻譯。免擴充功能月訂閱。",
+  "minimum_chrome_version": "138",
+  "permissions": [
+    "storage",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "雙語伴讀 · 自動翻譯設定",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "options_page": "setup.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js",
+        "auto.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src https://generativelanguage.googleapis.com https://api.deepseek.com"
+  }
+}

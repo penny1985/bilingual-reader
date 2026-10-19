@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>雙語伴讀</title>
+  <link rel="stylesheet" href="popup.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body>
+  <header class="brand"><img src="icons/48.png" alt="" width="34" height="34"><div><strong>雙語伴讀</strong><span>原文留著，理解跟上。</span></div><span class="local-tag" id="engine-tag">本機翻譯</span></header>
+  <main>
+    <label class="switch-row master" for="enabled"><span><strong>自動雙語翻譯</strong><small>開啟外語網頁，自動顯示繁體中文。</small></span><span class="switch"><input id="enabled" type="checkbox" role="switch" checked disabled><span aria-hidden="true"></span></span></label>
+    <section class="site-section" aria-labelledby="site-label">
+      <p class="eyebrow" id="site-label">目前網站</p><p id="hostname" class="hostname">正在讀取…</p>
+      <label class="switch-row site-switch" for="site-enabled"><span>這個網站自動翻譯</span><span class="switch small-switch"><input id="site-enabled" type="checkbox" role="switch" checked disabled><span aria-hidden="true"></span></span></label>
+      <div class="field"><label for="source">這個網站的原文</label><select id="source" disabled><option value="auto">自動偵測</option><option value="en">英文</option><option value="ja">日文</option><option value="ko">韓文</option><option value="fr">法文</option><option value="de">德文</option><option value="es">西班牙文</option><option value="pt">葡萄牙文</option><option value="ru">俄文</option><option value="vi">越南文</option><option value="th">泰文</option><option value="zh">簡體中文</option></select></div>
+    </section>
+    <div class="field style-field"><label for="style">譯文樣式</label><select id="style" disabled><option value="line">細線標示</option><option value="soft">柔和底色</option></select></div>
+    <section id="status-box" class="status" aria-live="polite" aria-atomic="true"><strong id="status-title">正在讀取設定…</strong><p id="status-detail">譯文會直接顯示在網頁段落下方。</p></section>
+    <div class="page-actions"><button id="restore" class="secondary" disabled>還原這頁</button><button id="retry" class="secondary" disabled>重新翻譯這頁</button></div>
+  </main>
+  <footer><button id="setup" class="text-button">翻譯引擎與設定 <span aria-hidden="true">↗</span></button><span id="engine-note">本機翻譯 · 不需訂閱</span></footer>
+</body>
+</html>

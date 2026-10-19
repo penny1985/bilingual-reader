@@ -1,0 +1,31 @@
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+secrets*.json
+
+# Browser profiles and local testing artifacts
+work/
+profiles/
+*-profile/
+*-profiles/
+chrome-profile/
+user-data-dir/
+test-results/
+playwright-report/
+captures/
+*.log
+*.har
+*.trace
+
+# Dependencies, generated archives and editor files
+node_modules/
+*.zip
+.DS_Store
+.idea/
+.vscode/
+coverage/
+

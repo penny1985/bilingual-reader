@@ -1,0 +1,21 @@
+{
+  "name": "bilingual-reader",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Chrome 自動網頁雙語閱讀擴充功能，支援 Gemini、DeepSeek 與 Chrome 本機翻譯。",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/penny1985/bilingual-reader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/penny1985/bilingual-reader/issues"
+  }
+}
