@@ -1,4 +1,4 @@
-import { normalizeLanguage } from './engine.js';
+import { detectSourceLanguage } from './source-language.js';
 import { AI_PROVIDERS, CloudTranslator } from './ai-engine.js';
 
 const DEFAULTS = { enabled: true, preparedSources: [], blockedHosts: [], style: 'line', sourceOverrides: {},
@@ -60,17 +60,12 @@ async function cancelSession(session) {
 }
 
 async function detectSource(tabId, info, config, hostname) {
-  const override = config.sourceOverrides?.[hostname];
-  if (override && override !== 'auto') return normalizeLanguage(override);
-  const html = normalizeLanguage(info?.lang);
-  let detected = null;
-  try { detected = normalizeLanguage(await chrome.tabs.detectLanguage(tabId)); } catch { /* HTML lang is a local fallback. */ }
-  if ((!detected || detected === 'zh') && html === 'zh-Hant') return 'zh-Hant';
-  const source = detected || html;
-  if (source) return source;
-  const sample = String(info?.sample || '');
-  const latin = (sample.match(/[a-z]/gi) || []).length;
-  return latin > 24 && latin / Math.max(1, sample.length) > 0.65 ? 'en' : null;
+  return detectSourceLanguage({
+    override: config.sourceOverrides?.[hostname],
+    lang: info?.lang,
+    sample: info?.sample,
+    detectLanguage: () => chrome.tabs.detectLanguage(tabId)
+  });
 }
 
 async function configure(message, sender) {

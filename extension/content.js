@@ -268,14 +268,20 @@
   }
 
   function renderTranslation(session, record, text) {
+    const originalStyle = getComputedStyle(record.element);
+    // Small floating labels often sit over a border. Keep their translation on
+    // the same line so a second block cannot cover the paragraph underneath.
+    const inlineLabel = originalStyle.position === "absolute"
+      && record.text.length <= 40 && text.length <= 24 && !/[\r\n]/u.test(text);
     const host = makeOwnedElement("bt-reader-translation", "translation");
     host.lang = session.config.targetLanguage;
     host.dir = "auto";
-    host.style.setProperty("display", "block", "important");
-    host.style.setProperty("margin", "8px 0 10px", "important");
+    host.style.setProperty("display", inlineLabel ? "inline" : "block", "important");
+    host.style.setProperty("margin", inlineLabel ? "0" : "8px 0 10px", "important");
+    if (inlineLabel) host.style.setProperty("margin-inline-start", ".4em", "important");
     host.style.setProperty("width", "auto", "important");
     host.style.setProperty("max-width", "100%", "important");
-    host.style.setProperty("flex-basis", "100%", "important");
+    host.style.setProperty("flex-basis", inlineLabel ? "auto" : "100%", "important");
     host.style.setProperty("position", "static", "important");
     const shadow = host.attachShadow({ mode: "closed" });
     const style = document.createElement("style");
@@ -286,11 +292,14 @@
         text-align: start; text-transform: none; text-decoration: none; }
       .line { border-inline-start: 2px solid #619c88; padding: 1px 0 1px 12px; }
       .soft { border-radius: 7px; padding: 9px 12px; background: rgba(128,128,128,.10); }
+      .inline-label { display: inline; padding: 0; border: 0; border-radius: 0;
+        background: none; line-height: inherit; white-space: normal; }
+      .inline-label::before { content: "·"; margin-inline-end: .4em; }
     `;
     const translation = document.createElement("div");
-    translation.className = `translation ${session.config.style}`;
+    translation.className = `translation ${inlineLabel ? "inline-label" : session.config.style}`;
     translation.textContent = text;
-    const originalStyle = getComputedStyle(record.element);
+    if (inlineLabel) host.style.setProperty("line-height", originalStyle.lineHeight, "important");
     translation.style.color = originalStyle.color;
     translation.style.fontFamily = originalStyle.fontFamily;
     const fontSize = parseFloat(originalStyle.fontSize) || 16;

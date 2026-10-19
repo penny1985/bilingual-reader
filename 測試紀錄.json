@@ -1,9 +1,9 @@
 {
-  "version": "3.0.2",
+  "version": "3.0.3",
   "date": "2026-10-20",
   "allBrowserTestsHeadless": false,
   "unit": {
-    "passed": 36,
+    "passed": 41,
     "command": "npm test"
   },
   "cloudIntegration": {
@@ -152,5 +152,63 @@
       "Physical mass and correct Taiwan phrases"
     ],
     "additionalNetworkRequests": 0
+  },
+  "backgroundLanguageDetection": {
+    "date": "2026-10-20",
+    "passed": 5,
+    "checks": [
+      "Explicit website override takes priority",
+      "Declared HTML language does not wait for inactive-tab Chrome detection",
+      "zh-Hant metadata is preserved",
+      "Missing-language detection settles after at most 1500 ms",
+      "Responsive non-English detection and failures preserve existing fallback semantics"
+    ],
+    "realRegression": "Inactive public NASA page with HTML lang=en waited indefinitely for chrome.tabs.detectLanguage; fixed before live article test"
+  },
+  "positionedLabelLayout": {
+    "date": "2026-10-20",
+    "passedChecks": 44,
+    "source": "Offline headless Chrome exercising actual content.js",
+    "widths": [
+      800,
+      375
+    ],
+    "styles": [
+      "line",
+      "soft"
+    ],
+    "checks": [
+      "Short absolutely-positioned labels show inline translations without overlapping the next paragraph",
+      "Original translation text remains exact",
+      "Normal paragraphs and headings retain block layout",
+      "Original source styles are unchanged",
+      "Restore returns exact original HTML"
+    ],
+    "liveArticleVerificationPending": false,
+    "liveNoOverlap": true
+  },
+  "liveArticleTest": {
+    "date": "2026-10-20",
+    "sourceUrl": "https://spaceplace.nasa.gov/blue-sky/en/",
+    "engine": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "extensionVersion": "3.0.3",
+    "stats": {
+      "mainEligibleCount": 27,
+      "mainTranslatedCount": 27,
+      "allEligibleCount": 41,
+      "allTranslatedCount": 41
+    },
+    "backgroundOnly": true,
+    "foregroundWindowActivated": false,
+    "elapsedSeconds": 173,
+    "originalTextRetained": true,
+    "imagesRetained": true,
+    "positionedShortLabelInline": true,
+    "positionedLabelOverlap": false,
+    "snapshotKind": "Actual bilingual DOM export, rendered separately in isolated headless Chrome",
+    "paidSetupPerformed": false,
+    "temporaryObserverIncludedInRelease": false,
+    "elapsedScope": "Final successful retry, including cached content; earlier attempts encountered transient HTTP 429. Not a cold-start benchmark."
   }
 }
