@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "雙語伴讀",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "網頁自動雙語閱讀，支援 Gemini、DeepSeek 自備金鑰與 Chrome 本機翻譯。免擴充功能月訂閱。",
   "minimum_chrome_version": "138",
   "permissions": [

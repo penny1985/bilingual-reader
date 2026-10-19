@@ -25,6 +25,8 @@ test('Gemini sends first-party HTTPS request, header key and untrusted source JS
   assert.match(captured.body.systemInstruction.parts[0].text, /zh-TW/);
   assert.match(captured.body.systemInstruction.parts[0].text, /never Simplified Chinese/);
   assert.match(captured.body.systemInstruction.parts[0].text, /quality as 品質 and physical mass as 質量/);
+  assert.match(captured.body.systemInstruction.parts[0].text, /NASA is 美國國家航空暨太空總署/);
+  assert.match(captured.body.systemInstruction.parts[0].text, /Keep the official names of Chinese organizations/);
   for (const term of ['資料集', '軟體', '硬體', '伺服器', '網路', '影片', '記憶體', '使用者']) {
     assert.ok(captured.body.systemInstruction.parts[0].text.includes(term));
   }
@@ -48,8 +50,8 @@ test('DeepSeek uses its current model, header key and disabled thinking', async 
 
 test('normalizes Gemini and DeepSeek mixed-script output once and caches Taiwan text', async () => {
   const literalUrl = 'https://example.com/软件?q=用户';
-  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。${literalUrl}`;
-  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。${literalUrl}`;
+  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。美国国家航空航天局（NASA），中國國家航天局。${literalUrl}`;
+  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。美國國家航空暨太空總署（NASA），中國國家航天局。${literalUrl}`;
   for (const [provider, response] of [['gemini', gemini], ['deepseek', deepseek]]) {
     let requests = 0;
     const translator = engine(async () => { requests++; return response(raw); });

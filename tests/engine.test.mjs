@@ -45,8 +45,8 @@ test('deduplicates initialization; caches by pair; cancelled work never calls th
 
 test('normalizes Chrome mixed-script output to Taiwan Traditional before caching', async () => {
   const literalUrl = 'https://example.com/软件?q=用户';
-  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。${literalUrl}`;
-  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。${literalUrl}`;
+  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。美国国家航空航天局（NASA），中國國家航天局。${literalUrl}`;
+  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。美國國家航空暨太空總署（NASA），中國國家航天局。${literalUrl}`;
   let calls = 0;
   const translator = new LocalTranslator({ create: async () => ({ translate: async () => { calls++; return raw; } }) });
   await translator.prepare('en', 'zh-Hant');

@@ -23,8 +23,24 @@ function convertProse(prose) {
   // 一齣來 or 萬里 into 萬裡, so use only Taiwan phrase/variant rules there.
   return prose.replace(/[^，。！？；：、\r\n]+/gu, (clause) => {
     const converter = [...clause].some((character) => simplifiedCharacters.has(character)) ? taiwanConverter : traditionalConverter;
+    // In Taiwan, 智能 is also the established word for human intellectual
+    // ability. OpenCC's broad 智能 → 智慧 rule must not change these terms.
+    // Keep AI references (人工智能測驗, for example) on the normal AI path.
+    const cognitiveTerms = /(?<!人工)智能(?:障[碍礙]|不足|[测測][验驗]|商[数數])/gu;
+    let converted = '';
+    let cursor = 0;
+    for (const match of clause.matchAll(cognitiveTerms)) {
+      converted += converter(clause.slice(cursor, match.index));
+      converted += '智能' + converter(match[0].slice(2));
+      cursor = match.index + match[0].length;
+    }
+    converted += converter(clause.slice(cursor));
     // Never replace 質量 globally: scientific mass must remain 質量.
-    return converter(clause)
+    return converted
+      // NASA aliases need a Taiwan proper-name correction in addition to
+      // character conversion. Scope this to the US agency: 航天 in Chinese
+      // agency/company names and other proper nouns must stay untouched.
+      .replace(/美國(?:國家)?(?:航空(?:暨|與|和|及)?(?:航天|太空)(?:管理)?(?:局|總署)|(?:航太|航天|太空)(?:管理)?(?:局|總署))/gu, '美國國家航空暨太空總署')
       .replace(/(軟體|服務|翻譯)質量/g, '$1品質')
       .replace(/賬號/g, '帳號')
       // Correct an upstream Taiwan dictionary target containing Simplified 别.
@@ -159,7 +175,8 @@ function protectedSpans(text) {
 
 /**
  * Normalize translated prose to Taiwan Traditional Chinese, fully offline.
- * This changes spelling and dictionary phrases, not a sentence's meaning.
+ * This changes spelling, regional terms and known proper-name aliases,
+ * not a sentence's meaning.
  * URLs, code and technical literals are intentionally kept byte-for-byte.
  */
 export function toTaiwanTraditional(text) {

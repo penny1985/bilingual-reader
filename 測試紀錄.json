@@ -1,9 +1,9 @@
 {
-  "version": "3.0.3",
+  "version": "3.0.4",
   "date": "2026-10-20",
   "allBrowserTestsHeadless": false,
   "unit": {
-    "passed": 41,
+    "passed": 46,
     "command": "npm test"
   },
   "cloudIntegration": {
@@ -189,10 +189,11 @@
   },
   "liveArticleTest": {
     "date": "2026-10-20",
+    "capturedAt": "2026-10-19T17:55:03.065Z",
     "sourceUrl": "https://spaceplace.nasa.gov/blue-sky/en/",
     "engine": "gemini",
     "model": "gemini-3.5-flash-lite",
-    "extensionVersion": "3.0.3",
+    "extensionVersion": "3.0.4",
     "stats": {
       "mainEligibleCount": 27,
       "mainTranslatedCount": 27,
@@ -201,14 +202,43 @@
     },
     "backgroundOnly": true,
     "foregroundWindowActivated": false,
-    "elapsedSeconds": 173,
+    "originalActiveTabPreserved": true,
+    "paidSetupPerformed": false,
+    "freeQuotaLimitSeenOnFirstAttempt": true,
+    "explicitSameFreeEngineRetries": 1,
+    "retryCooldownSeconds": 65,
+    "elapsedSeconds": 177,
+    "elapsedScope": "Final successful attempt only; excludes initial rate/quota-limited attempt and 65-second cooldown. Not a cold-start benchmark.",
     "originalTextRetained": true,
     "imagesRetained": true,
     "positionedShortLabelInline": true,
     "positionedLabelOverlap": false,
+    "nasaCanonicalName": "美國國家航空暨太空總署",
+    "nasaCanonicalMentions": 3,
+    "knownVocabularyLeaks": 0,
     "snapshotKind": "Actual bilingual DOM export, rendered separately in isolated headless Chrome",
-    "paidSetupPerformed": false,
-    "temporaryObserverIncludedInRelease": false,
-    "elapsedScope": "Final successful retry, including cached content; earlier attempts encountered transient HTTP 429. Not a cold-start benchmark."
+    "temporaryObserverIncludedInRelease": false
+  },
+  "taiwanVocabulary": {
+    "date": "2026-10-20",
+    "normalization": "Offline OpenCC Taiwan dictionaries plus US-scoped NASA alias normalization",
+    "nasaCanonicalName": "美國國家航空暨太空總署",
+    "newUnitTests": 5,
+    "normalizerTestsPassed": 18,
+    "checks": [
+      "Simplified and Traditional NASA aliases normalize consistently",
+      "Official China agency names remain unchanged",
+      "Common interface and AI Taiwan terms in both scripts",
+      "Human intellectual-ability terms stay 智能 while artificial intelligence stays 人工智慧",
+      "Physical mass stays 質量 and protected technical literals stay exact",
+      "Cloud and local engines normalize NASA terms before caching"
+    ],
+    "additionalNormalizationNetworkRequests": 0,
+    "promptVersion": "taiwan-translation-3",
+    "liveBackgroundRetestPending": false,
+    "actualTranslationsChecked": 41,
+    "manualReview": "All 41 actual source/translation pairs inspected; no obvious Simplified characters or Mainland regional vocabulary found in this article.",
+    "knownVocabularyLeaks": 0,
+    "nasaCanonicalMentions": 3
   }
 }

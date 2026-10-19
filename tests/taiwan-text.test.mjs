@@ -17,6 +17,66 @@ test('converts both Simplified and non-Taiwan Traditional phrases', () => {
   assert.equal(toTaiwanTraditional('视频会议和視頻通話。'), '視訊會議和視訊通話。');
 });
 
+test('normalizes the real NASA article aliases to one Taiwan agency name', () => {
+  const expected = '美國國家航空暨太空總署';
+  for (const alias of [
+    '美国国家航空航天局',
+    '美國航空航天局',
+    '美國國家航空航天局',
+    '美國國家航空與航天局',
+    '美国国家航空航天管理局',
+    '美國航太總署',
+    '美國太空總署',
+    '美國國家航空和太空總署',
+    expected,
+  ]) {
+    assert.equal(toTaiwanTraditional(`${alias}（NASA）的火星探測車。`), `${expected}（NASA）的火星探測車。`);
+    assert.equal(toTaiwanTraditional(toTaiwanTraditional(alias)), expected);
+  }
+  assert.equal(
+    toTaiwanTraditional('來自美國航空航天局（NASA）火星探測車和登陸器的照片。'),
+    '來自美國國家航空暨太空總署（NASA）火星探測車和登陸器的照片。',
+  );
+});
+
+test('keeps other official space-agency names and ambiguous aerospace words', () => {
+  const traditional = '中國國家航天局、中國航天科技集團、國家航天局、航空航天局。';
+  assert.equal(toTaiwanTraditional(traditional), traditional);
+  assert.equal(toTaiwanTraditional('中国国家航天局、中国航天科技集团、国家航天局、航空航天局。'), traditional);
+  assert.equal(toTaiwanTraditional('航空航天領域的質量守恆與粒子質量。'), '航空航天領域的質量守恆與粒子質量。');
+});
+
+test('keeps human intellectual-ability terms and still converts artificial intelligence', () => {
+  const expected = '智能障礙、智能不足、智能測驗、智能商數。人工智慧、智慧手機、人工智慧測驗。';
+  assert.equal(toTaiwanTraditional('智能障礙、智能不足、智能測驗、智能商數。人工智能、智能手機、人工智能測驗。'), expected);
+  assert.equal(toTaiwanTraditional('智能障碍、智能不足、智能测验、智能商数。人工智能、智能手机、人工智能测验。'), expected);
+  assert.equal(toTaiwanTraditional(expected), expected);
+});
+
+test('covers common Taiwan interface and AI vocabulary in both scripts', () => {
+  const expected = '預設、連結、螢幕、滑鼠、硬體、軟體、網路、伺服器、資料集、人工智慧、智慧手機。';
+  assert.equal(toTaiwanTraditional('默认、链接、屏幕、鼠标、硬件、软件、网络、服务器、数据集、人工智能、智能手机。'), expected);
+  assert.equal(toTaiwanTraditional('默認、鏈接、屏幕、鼠標、硬件、軟件、網絡、服務器、數據集、人工智能、智能手機。'), expected);
+  assert.equal(toTaiwanTraditional(expected), expected);
+});
+
+test('does not apply proper-name corrections inside code, URLs, paths or filenames', () => {
+  const literals = [
+    '`美國航空航天局`',
+    'https://example.com/美國航空航天局?q=美国国家航空航天局',
+    '/資料/美國航空航天局.txt',
+    '美國航空航天局.json',
+    'config.美國航空航天局',
+  ];
+  for (const literal of literals) {
+    assert.equal(toTaiwanTraditional(`美國航空航天局 ${literal}。`), `美國國家航空暨太空總署 ${literal}。`);
+  }
+  assert.equal(
+    toTaiwanTraditional('[美國航空航天局](../美国国家航空航天局/资料.md)'),
+    '[美國國家航空暨太空總署](../美国国家航空航天局/资料.md)',
+  );
+});
+
 test('uses 品質 only for specific quality collocations and keeps physical mass', () => {
   assert.equal(
     toTaiwanTraditional('软件质量、服務質量、产品质量、翻譯質量。粒子质量为 5 kg，质量守恒；质量中心保持不变。'),

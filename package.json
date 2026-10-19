@@ -1,6 +1,6 @@
 {
   "name": "bilingual-reader",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "private": true,
   "description": "Chrome 自動網頁雙語閱讀擴充功能，支援 Gemini、DeepSeek 與 Chrome 本機翻譯。",
   "type": "module",
