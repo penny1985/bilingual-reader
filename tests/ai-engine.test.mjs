@@ -22,6 +22,12 @@ test('Gemini sends first-party HTTPS request, header key and untrusted source JS
   assert.match(captured.body.systemInstruction.parts[0].text, /untrusted webpage text/);
   assert.match(captured.body.systemInstruction.parts[0].text, /negation, conditions/);
   assert.match(captured.body.systemInstruction.parts[0].text, /sarcasm/);
+  assert.match(captured.body.systemInstruction.parts[0].text, /zh-TW/);
+  assert.match(captured.body.systemInstruction.parts[0].text, /never Simplified Chinese/);
+  assert.match(captured.body.systemInstruction.parts[0].text, /quality as 品質 and physical mass as 質量/);
+  for (const term of ['資料集', '軟體', '硬體', '伺服器', '網路', '影片', '記憶體', '使用者']) {
+    assert.ok(captured.body.systemInstruction.parts[0].text.includes(term));
+  }
   assert.equal(JSON.parse(captured.body.contents[0].parts[0].text).source_text, base.text);
   assert.equal(captured.body.generationConfig.responseMimeType, 'application/json');
   assert.equal(captured.body.generationConfig.thinkingConfig.thinkingLevel, 'LOW');
@@ -38,6 +44,20 @@ test('DeepSeek uses its current model, header key and disabled thinking', async 
   assert.deepEqual(captured.body.thinking, { type: 'disabled' });
   assert.deepEqual(captured.body.response_format, { type: 'json_object' });
   assert.equal(JSON.parse(captured.body.messages[1].content).source_text, base.text);
+});
+
+test('normalizes Gemini and DeepSeek mixed-script output once and caches Taiwan text', async () => {
+  const literalUrl = 'https://example.com/软件?q=用户';
+  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。${literalUrl}`;
+  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。${literalUrl}`;
+  for (const [provider, response] of [['gemini', gemini], ['deepseek', deepseek]]) {
+    let requests = 0;
+    const translator = engine(async () => { requests++; return response(raw); });
+    assert.equal(await translator.translate({ ...base, provider }), expected);
+    assert.equal(await translator.translate({ ...base, provider, sessionId: 'cache-hit' }), expected);
+    assert.equal(requests, 1, `${provider} normalization must not send an extra request`);
+    assert.deepEqual([...translator.cache.values()], [expected]);
+  }
 });
 
 test('rejects unsupported endpoint/model/target and invalid keys without any fetch', async () => {
@@ -228,7 +248,7 @@ test('timeout aborts a non-cooperating fetch and the queue remains usable', asyn
 
 test('testConnection sends only the fixed neutral sample and returns a translated preview', async () => {
   let source;
-  const translator = engine(async (url, options) => { source = JSON.parse(JSON.parse(options.body).contents[0].parts[0].text).source_text; return gemini(); });
+  const translator = engine(async (url, options) => { source = JSON.parse(JSON.parse(options.body).contents[0].parts[0].text).source_text; return gemini('博物馆九点开门。'); });
   const result = await translator.testConnection({ provider: 'gemini', apiKey: base.apiKey, text: 'PRIVATE PAGE SHOULD NOT BE SENT' });
   assert.deepEqual(result, { ok: true, translation: '博物館九點開門。' });
   assert.equal(source, 'The museum opens at nine. Admission is free on Sundays.');

@@ -1,3 +1,5 @@
+import { toTaiwanTraditional } from './taiwan-text.js';
+
 // Chrome downloads and runs its own language models; this extension has no fetch calls.
 export const SUPPORTED_SOURCES = new Set([
   'ar', 'bg', 'bn', 'cs', 'da', 'de', 'el', 'en', 'es', 'fi', 'fr', 'he', 'hi',
@@ -112,7 +114,8 @@ export class LocalTranslator {
         results.push(result.trim());
       }
       if (!isCurrent()) throw new DOMException('Cancelled', 'AbortError');
-      const translated = results.join('\n');
+      const joined = results.join('\n');
+      const translated = targetLanguage === 'zh-Hant' ? toTaiwanTraditional(joined) : joined;
       this.cache.set(key, translated);
       while (this.cache.size > this.cacheLimit) this.cache.delete(this.cache.keys().next().value);
       return translated;

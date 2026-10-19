@@ -43,6 +43,26 @@ test('deduplicates initialization; caches by pair; cancelled work never calls th
   assert.equal(calls.length, 3);
 });
 
+test('normalizes Chrome mixed-script output to Taiwan Traditional before caching', async () => {
+  const literalUrl = 'https://example.com/软件?q=用户';
+  const raw = `软件、硬件、服务器、网络、视频、内存、用户、数据集。\n軟件、服務器、網絡、視頻、內存、用戶、數據集。不會删除；日期 2026-05-12，金额 1,250，质量为 5 kg。${literalUrl}`;
+  const expected = `軟體、硬體、伺服器、網路、影片、記憶體、使用者、資料集。\n軟體、伺服器、網路、影片、記憶體、使用者、資料集。不會刪除；日期 2026-05-12，金額 1,250，質量為 5 kg。${literalUrl}`;
+  let calls = 0;
+  const translator = new LocalTranslator({ create: async () => ({ translate: async () => { calls++; return raw; } }) });
+  await translator.prepare('en', 'zh-Hant');
+  assert.equal(await translator.translate('Technical settings.', 'en', 'zh-Hant'), expected);
+  assert.equal(await translator.translate('Technical settings.', 'en', 'zh-Hant'), expected);
+  assert.equal(calls, 1);
+  assert.deepEqual([...translator.cache.values()], [expected]);
+});
+
+test('leaves other target languages unchanged instead of applying Chinese conversion', async () => {
+  const raw = '软件、数据；质量 5 kg。';
+  const translator = new LocalTranslator({ create: async () => ({ translate: async () => raw }) });
+  await translator.prepare('en', 'ja');
+  assert.equal(await translator.translate('A Japanese quotation.', 'en', 'ja'), raw);
+});
+
 test('only one model request executes at a time and failures do not stop the queue', async () => {
   let active = 0;
   let maximum = 0;

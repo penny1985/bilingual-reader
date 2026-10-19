@@ -1,9 +1,9 @@
 {
-  "version": "3.0.1",
-  "date": "2026-10-19",
+  "version": "3.0.2",
+  "date": "2026-10-20",
   "allBrowserTestsHeadless": false,
   "unit": {
-    "passed": 20,
+    "passed": 36,
     "command": "npm test"
   },
   "cloudIntegration": {
@@ -124,5 +124,33 @@
     "automatic": true,
     "toolbarClickRequired": false,
     "sidePanelRequired": false
+  },
+  "taiwanNormalization": {
+    "date": "2026-10-20",
+    "module": "extension/taiwan-text.js",
+    "dictionary": "opencc-js 1.4.2, bundled offline",
+    "dedicatedTests": 13,
+    "regressionSource": "Historical Gemini mixed Simplified/Traditional output from 2026-10-19; no new AI request",
+    "examples": {
+      "数据集": "資料集",
+      "服务器": "伺服器",
+      "软件": "軟體",
+      "网络": "網路",
+      "账号": "帳號"
+    },
+    "covers": [
+      "Chrome local output",
+      "Gemini output and test preview",
+      "DeepSeek output",
+      "Normalized memory cache without extra API calls"
+    ],
+    "preserves": [
+      "Original source paragraphs",
+      "URLs and Markdown destinations",
+      "Code and common file paths",
+      "Numbers, dates and negation",
+      "Physical mass and correct Taiwan phrases"
+    ],
+    "additionalNetworkRequests": 0
   }
 }
