@@ -29,6 +29,8 @@
 
 Gemini 預設提供 Gemini 3.8 Flash，另可選 Gemini 3.5 Flash-Lite；DeepSeek 可選 Flash 或 V4 Pro。模型名稱、供應狀態與價格可能調整，使用前以服務商為準。[Gemini 模型與計費](https://ai.google.dev/gemini-api/docs/pricing)、[DeepSeek 模型與計費](https://api-docs.deepseek.com/quick_start/pricing)
 
+為減少免費層級的短時間限速，Gemini 3.8 Flash 的請求起始至少間隔 13 秒，Gemini 3.5 Flash-Lite 至少間隔 4.3 秒；文章會逐段顯示譯文。這是套件的節流設定，實際每分鐘、每日與文字用量配額仍依模型及 Google API 專案而定，請以 [AI Studio 的額度頁面](https://aistudio.google.com/usage?tab=rate-limit) 為準。
+
 切換引擎需要自行選擇。配額用完、金鑰失效或翻譯出錯時，套件會顯示狀態，**不會偷偷改接其他付費引擎**。本套件不會替你開通任何 API 帳單。
 
 選擇 Chrome 本機引擎時，按「使用本機翻譯」，並在設定準備所需的來源語言。模型準備完成後，可關閉設定頁；模型備妥且可用時，翻譯在這台電腦運算。切換引擎後，已開啟的文章可重新整理，或按「重新翻譯這頁」。
@@ -65,7 +67,11 @@ Gemini 預設提供 Gemini 3.8 Flash，另可選 Gemini 3.5 Flash-Lite；DeepSee
 npm test
 ```
 
-測試涵蓋引擎邏輯、取消與模擬的 API 回應。Chrome 本機引擎曾以真實模型完成自動翻譯、網站開關、捲動與動態內容等驗證；雲端 AI 的自動測試使用模擬回應，**沒有使用私人金鑰進行線上品質認證**。功能測試通過不代表與其他產品的翻譯品質相當。
+自動測試涵蓋引擎邏輯、取消、免費層級節流與模擬的 API 回應，共 20 項通過。另有 Chrome 本機真實模型的自動翻譯、網站開關、捲動與動態內容等驗證；雲端自動整合測試仍使用模擬回應，與以下線上實測分開記錄。
+
+2026-10-19 以相同 6 段英文實測：Chrome 本機 Translator API 完成 6/6；Gemini 3.5 Flash-Lite 完成 6/6，API 回傳共 1,242 tokens（輸入 1,021、輸出 221）。Gemini 3.8 Flash 六次均收到 HTTP 503，沒有成功譯文，無法評估其品質。另以一個固定英文區塊驗證真實 Gemini 自動網頁翻譯：未點工具列、未開側邊欄，譯文自動出現且保留原文。測試未開通付費。
+
+完整原文、實際譯文、耗時與限制見 [翻譯品質試讀](翻譯品質試讀.html)。Flash-Lite 的反諷與部分用語較自然，但長句曾混入簡體字；此 6 段測試無法代表所有文章，也不能據此宣稱與其他產品的翻譯品質相當。
 
 要測試本機示範頁，可在專案根目錄啟動 HTTP 伺服器，例如 `python3 -m http.server 8765 --bind 127.0.0.1`，再開啟 `http://127.0.0.1:8765/demo.html`。
 

@@ -28,6 +28,12 @@ const TEST_TEXT = 'The museum opens at nine. Admission is free on Sundays.';
 const MAX_INPUT = 16000;
 const MAX_CHUNK = 6000;
 const MAX_RESPONSE_BYTES = 300000;
+// Conservative spacing for the verified Free-tier per-model request limits.
+// An explicit constructor override remains available for tests and benchmarks.
+const GEMINI_MIN_INTERVAL_MS = Object.freeze({
+  'gemini-3.8-flash': 13000,
+  'gemini-3.5-flash-lite': 4300
+});
 
 export class CloudTranslationError extends Error {
   constructor(code, message) { super(message); this.name = 'CloudTranslationError'; this.code = code; }
@@ -138,7 +144,7 @@ async function fingerprint(config) {
 export class CloudTranslator {
   constructor(options = {}) {
     this.fetch = options.fetch || globalThis.fetch?.bind(globalThis);
-    this.minIntervalMs = Math.max(0, options.minIntervalMs ?? 1200);
+    this.minIntervalMs = options.minIntervalMs == null ? null : Math.max(0, options.minIntervalMs);
     this.timeoutMs = Math.max(1, options.timeoutMs ?? 45000);
     this.cacheLimit = Math.max(0, options.cacheLimit ?? 400);
     this.cache = new Map();
@@ -215,7 +221,9 @@ export class CloudTranslator {
       if (signal.aborted) stop();
     });
     await this.assertCurrent(job, config);
-    this.nextStartAt = Date.now() + this.minIntervalMs;
+    const intervalMs = this.minIntervalMs ??
+      (config.provider === 'gemini' ? GEMINI_MIN_INTERVAL_MS[config.model] : 1200);
+    this.nextStartAt = Date.now() + intervalMs;
   }
 
   async request(job, config, text) {

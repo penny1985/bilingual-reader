@@ -142,6 +142,34 @@ test('serializes network requests and recovers after a failure without paid retr
   assert.equal(maximum, 1);
 });
 
+test('paces default Gemini models for Free-tier limits and preserves explicit overrides', async context => {
+  context.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 100000 });
+  for (const [provider, model, override, interval] of [
+    ['gemini', 'gemini-3.8-flash', undefined, 13000],
+    ['gemini', 'gemini-3.5-flash-lite', undefined, 4300],
+    ['deepseek', 'deepseek-flash', undefined, 1200],
+    ['gemini', 'gemini-3.8-flash', 0, 0],
+    ['gemini', 'gemini-3.5-flash-lite', 2000, 2000]
+  ]) {
+    const translator = new CloudTranslator({ minIntervalMs: override });
+    const job = { controller: new AbortController() };
+    const config = { provider, model };
+    const startedAt = Date.now();
+    await translator.waitForTurn(job, config);
+    assert.equal(translator.nextStartAt, startedAt + interval);
+    if (!interval) continue;
+    let ready = false;
+    const nextTurn = translator.waitForTurn(job, config).then(() => { ready = true; });
+    context.mock.timers.tick(interval - 1);
+    await Promise.resolve();
+    assert.equal(ready, false, `${model} must wait for its full interval`);
+    context.mock.timers.tick(1);
+    await nextTurn;
+    assert.equal(Date.now() - startedAt, interval);
+    assert.equal(translator.nextStartAt, startedAt + interval * 2);
+  }
+});
+
 test('cancelling a session aborts active fetch, discards late results and cancels its queue', async () => {
   let resolveFetch, started;
   const isStarted = new Promise(resolve => { started = resolve; });

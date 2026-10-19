@@ -1,9 +1,9 @@
 {
-  "version": "3.0.0",
+  "version": "3.0.1",
   "date": "2026-10-19",
-  "allBrowserTestsHeadless": true,
+  "allBrowserTestsHeadless": false,
   "unit": {
-    "passed": 19,
+    "passed": 20,
     "command": "npm test"
   },
   "cloudIntegration": {
@@ -63,5 +63,66 @@
     "passed": 13,
     "liveAPI": false
   },
-  "qualityNote": "雲端整合採模擬回覆，未使用真實 API 金鑰做線上品質評測。本機品質試讀另見翻譯品質試讀.html。"
+  "qualityNote": "2026-10-19 線上實測與自動模擬整合測試分開記錄：相同 6 段英文，Chrome 本機 Translator API 完成 6/6；Gemini 3.5 Flash-Lite 完成 6/6，共回傳 1,242 tokens；Gemini 3.8 Flash 六次均回覆 HTTP 503，無成功譯文，品質未評估。另驗證 1 個固定網頁區塊自動顯示真實 Gemini 譯文且保留原文，未點工具列或開側邊欄。譯文、耗時與限制見翻譯品質試讀.html。",
+  "freeTierPacing": {
+    "verifiedBy": "unit test with a virtual clock; no live API request",
+    "defaultMinimumStartIntervalMs": {
+      "gemini-3.8-flash": 13000,
+      "gemini-3.5-flash-lite": 4300,
+      "deepseek": 1200
+    },
+    "checks": [
+      "Each Gemini model waits for its full configured minimum start interval",
+      "Explicit constructor intervals, including zero for fixtures, remain supported",
+      "DeepSeek pacing is unchanged"
+    ],
+    "note": "Actual Free-tier quotas depend on the model and Google API project; pacing does not guarantee quota availability."
+  },
+  "automatedBrowserTestsHeadless": true,
+  "liveComparison": {
+    "date": "2026-10-19",
+    "source": "6 fixed synthetic English passages; same source text for each engine",
+    "targetLanguage": "zh-Hant",
+    "native": {
+      "engine": "Chrome local Translator API",
+      "passed": 6,
+      "total": 6,
+      "freshResults": true,
+      "notChromeWholePageContextMenuTranslation": true
+    },
+    "gemini-3.5-flash-lite": {
+      "passed": 6,
+      "total": 6,
+      "usageMetadata": {
+        "promptTokenCount": 1021,
+        "candidatesTokenCount": 221,
+        "totalTokenCount": 1242
+      }
+    },
+    "gemini-3.8-flash": {
+      "passed": 0,
+      "total": 6,
+      "http503Count": 6,
+      "qualityEvaluated": false
+    },
+    "freeTierVerifiedBeforeRequests": true,
+    "billingSetupPerformed": false,
+    "report": "翻譯品質試讀.html",
+    "limitations": [
+      "Only six fixed passages; no blind or multi-reviewer evaluation",
+      "Flash-Lite output contained Simplified Chinese characters in one long sentence",
+      "HTTP 503 is a service-availability result, not a translation-quality result"
+    ]
+  },
+  "liveAutomaticTranslation": {
+    "date": "2026-10-19",
+    "model": "gemini-3.5-flash-lite",
+    "fixedSyntheticSource": "The museum opens at nine. Admission is free on Sundays.",
+    "translatedBlocks": 1,
+    "expectedBlocks": 1,
+    "originalRetained": true,
+    "automatic": true,
+    "toolbarClickRequired": false,
+    "sidePanelRequired": false
+  }
 }
