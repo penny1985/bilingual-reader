@@ -41,7 +41,11 @@ function convertProse(prose) {
       // character conversion. Scope this to the US agency: 航天 in Chinese
       // agency/company names and other proper nouns must stay untouched.
       .replace(/美國(?:國家)?(?:航空(?:暨|與|和|及)?(?:航天|太空)(?:管理)?(?:局|總署)|(?:航太|航天|太空)(?:管理)?(?:局|總署))/gu, '美國國家航空暨太空總署')
-      .replace(/(軟體|服務|翻譯)質量/g, '$1品質')
+      // These compounds name people. Keep formal organization names, such as
+      // 中國航天員科研訓練中心, intact rather than rewriting their legal names.
+      .replace(/(?:宇航|航天)員(?:科研訓練中心|訓練中心|研究中心|中心|總隊|大隊|協會|研究所|學院|辦公室)?/gu,
+        (term) => term.length === 3 ? '太空人' : term)
+      .replace(/(軟體|服務|翻譯|工作|生活|教育|教學|影像|影片|音訊)質量/g, '$1品質')
       .replace(/賬號/g, '帳號')
       // Correct an upstream Taiwan dictionary target containing Simplified 别.
       .replace(/類别範本/g, '類別範本');
@@ -144,12 +148,31 @@ function protectedSpans(text) {
 
   // Preserve common filesystem paths, filenames and explicit code identifiers.
   const absolutePaths = /(?<![\p{L}\p{N}_])(?:[A-Za-z]:[\\/]|(?:~|\.\.?)\/|\/)[^\s<>"'`，。！？；：、（）「」『』【】《》]*[\p{L}\p{N}_~%]/gu;
-  while ((match = absolutePaths.exec(text))) protect(match.index, absolutePaths.lastIndex);
+  while ((match = absolutePaths.exec(text))) {
+    // A spaced fraction (1 /3用户) is not an absolute filesystem path.
+    if (/^\/\d/.test(match[0]) && /\d\s+$/.test(text.slice(0, match.index))) continue;
+    protect(match.index, absolutePaths.lastIndex);
+  }
   const relativePaths = /(?:[\p{L}\p{N}_~%+@.-]+[\\/])+[\p{L}\p{N}_~%+@.()[\]\\-]+/gu;
   while ((match = relativePaths.exec(text))) {
     // Unmarked Chinese slash lists such as 輸入/輸出 are ordinary prose.
-    // An ASCII path segment or filename extension makes the literal explicit.
-    if (/[A-Za-z0-9._~%@+-]/.test(match[0])) protect(match.index, relativePaths.lastIndex);
+    // Require a whole ASCII segment containing a letter, or a filename
+    // extension. A digit anywhere in a clause must not protect all of it:
+    // 大约1/3用户 and 2026/10软件用户数据 both need normal conversion.
+    const segments = match[0].split(/[\\/]/u);
+    const asciiSegment = (segment) => /^[A-Za-z0-9_~%@+.-]*[A-Za-z][A-Za-z0-9_~%@+.-]*$/u.test(segment);
+    const hasAsciiSegment = segments.some(asciiSegment);
+    const hasExtension = /\.[A-Za-z][A-Za-z0-9]{0,9}$/u.test(segments.at(-1));
+    // Uppercase alternatives commonly belong to prose: CPU/GPU软件性能,
+    // A/B测试 and Q3/Q4用户数据. These ambiguous tokens do not establish a
+    // path by themselves; backticks, an explicit root or a filename still do.
+    const acronymSlashProse = /\p{Script=Han}/u.test(match[0]) &&
+      !segments.some((segment) => asciiSegment(segment) && !/^[A-Z][A-Z0-9]*(?:s)?$/u.test(segment));
+    // Scientific units in ratios (質量為1/kg, 大約1/3kg) are not path
+    // segments either. Genuine paths such as v1/kg/用户 stay literal.
+    const unit = /^(?:\d+(?:\.\d+)?)?(?:kg|mg|g|t|km|cm|mm|m|ms|s|h|kHz|Hz|mL|ml|L|mol|K|Pa|W|J|N|V|A)$/u;
+    const numericUnitRatio = !asciiSegment(segments[0]) && /\d$/u.test(segments[0]) && unit.test(segments[1]);
+    if (hasExtension || (hasAsciiSegment && !numericUnitRatio && !acronymSlashProse)) protect(match.index, relativePaths.lastIndex);
   }
   const filenames = /[\p{L}\p{N}_-]+\.[A-Za-z][A-Za-z0-9]{0,9}(?![\p{L}\p{N}_])/gu;
   while ((match = filenames.exec(text))) protect(match.index, filenames.lastIndex);

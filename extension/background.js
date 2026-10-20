@@ -11,12 +11,27 @@ void storageReady.then(() => chrome.storage.local.set({ btInstalledVersion: chro
 const pendingSessions = new Set();
 const failedCloudSessions = new Map();
 const jobs = new Map();
+const tabPages = new Map();
+const navigationRevisions = new Map();
 let creatingOffscreen;
 const sessionKey = tabId => `bt:session:${tabId}`;
 const stateKey = tabId => `bt:state:${tabId}`;
 
 function isWeb(url) {
   try { return ['http:', 'https:'].includes(new URL(url).protocol); } catch { return false; }
+}
+function pageUrl(url) { return isWeb(url) ? new URL(url).href.split('#')[0] : ''; }
+function requestedPage(message, sender) {
+  const requested = pageUrl(typeof message.pageUrl === 'string' ? message.pageUrl : sender.url);
+  return requested && new URL(requested).origin === new URL(sender.url).origin ? requested : '';
+}
+async function currentPage(sender, revision, requestedUrl) {
+  if (!requestedUrl || (navigationRevisions.get(sender.tab.id) || 0) !== revision) return false;
+  try {
+    const tab = await chrome.tabs.get(sender.tab.id);
+    return pageUrl(tab.pendingUrl || tab.url || '') === requestedUrl &&
+      (navigationRevisions.get(sender.tab.id) || 0) === revision;
+  } catch { return false; }
 }
 async function settings() { await storageReady; return chrome.storage.local.get(DEFAULTS); }
 async function sessionFor(tabId) { return (await chrome.storage.session.get(sessionKey(tabId)))[sessionKey(tabId)]; }
@@ -71,19 +86,28 @@ async function detectSource(tabId, info, config, hostname) {
 async function configure(message, sender) {
   const tabId = sender.tab.id;
   const documentId = sender.documentId;
+  // Chrome keeps MessageSender.url at the original document URL after SPA
+  // navigation. Bind to the isolated content script's current route only after
+  // checking its origin and the browser's authoritative current tab URL.
+  const requestedUrl = requestedPage(message, sender);
   const hostname = new URL(sender.url).hostname;
+  if (!tabPages.has(tabId) && requestedUrl) tabPages.set(tabId, requestedUrl);
+  const revision = navigationRevisions.get(tabId) || 0;
+  if (!await currentPage(sender, revision, requestedUrl)) return { ok: false, cancelled: true };
   const config = await settings();
   const previous = await sessionFor(tabId);
+  if (!await currentPage(sender, revision, requestedUrl)) return { ok: false, cancelled: true };
   await cancelSession(previous);
   await chrome.storage.session.remove(sessionKey(tabId));
   if (!config.enabled || config.blockedHosts.includes(hostname)) {
     await storeState(tabId, { status: 'paused' });
-    return { ok: true, enabled: false };
+    return { ok: true, enabled: false, disabled: true };
   }
   const sourceLanguage = await detectSource(tabId, message.info, config, hostname);
+  if (!await currentPage(sender, revision, requestedUrl)) return { ok: false, cancelled: true };
   if (!sourceLanguage || sourceLanguage === 'zh-Hant') {
     await storeState(tabId, { status: 'idle', sourceLanguage, error: sourceLanguage ? '這頁已是繁體中文。' : '這頁語言不明，可從工具列指定。' });
-    return { ok: true, enabled: false };
+    return { ok: true, enabled: false, sourceLanguage, needsLanguage: !sourceLanguage };
   }
   const engine = Object.hasOwn(AI_PROVIDERS, config.aiEngine) ? config.aiEngine : 'local';
   if (engine !== 'local') {
@@ -97,10 +121,16 @@ async function configure(message, sender) {
     await storeState(tabId, { status: 'needsSetup', sourceLanguage, error: '請先在「語言與初次設定」準備這個語言的模型，之後就會自動翻譯。' });
     return { ok: true, enabled: false, needsSetup: true, sourceLanguage };
   }
-  const session = { id: crypto.randomUUID(), documentId, sourceLanguage, targetLanguage: 'zh-Hant', hostname, pageUrl: sender.url.split('#')[0], engine,
+  if (!await currentPage(sender, revision, requestedUrl)) return { ok: false, cancelled: true };
+  const session = { id: crypto.randomUUID(), documentId, sourceLanguage, targetLanguage: 'zh-Hant', hostname, pageUrl: requestedUrl, engine,
     model: engine === 'local' ? '' : config.aiProviders[engine]?.model || AI_PROVIDERS[engine].defaultModel, revision: config.aiRevision };
   pendingSessions.add(session.id);
   await chrome.storage.session.set({ [sessionKey(tabId)]: session });
+  if (!await currentPage(sender, revision, requestedUrl)) {
+    await cancelSession(session);
+    if ((await sessionFor(tabId))?.id === session.id) await chrome.storage.session.remove(sessionKey(tabId));
+    return { ok: false, cancelled: true };
+  }
   await storeState(tabId, { status: 'translating', sourceLanguage });
   return { ok: true, enabled: true, sessionId: session.id, sourceLanguage, targetLanguage: 'zh-Hant', style: config.style === 'soft' ? 'soft' : 'line' };
 }
@@ -162,7 +192,7 @@ async function handleContent(message, sender) {
 
 async function reconfigureTabs() {
   const tabs = await chrome.tabs.query({});
-  await Promise.allSettled(tabs.filter(tab => isWeb(tab.url)).map(tab => chrome.tabs.sendMessage(tab.id, { type: 'BT_RECONFIGURE' })));
+  await Promise.allSettled(tabs.filter(tab => isWeb(tab.url)).map(tab => chrome.tabs.sendMessage(tab.id, { type: 'BT_RECONFIGURE', reason: 'settings' })));
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -193,7 +223,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await chrome.storage.session.remove(sessionKey(message.tabId));
         await chrome.tabs.sendMessage(message.tabId, { type: 'BT_RESTORE' });
         await storeState(message.tabId, { status: 'paused' });
-      } else await chrome.tabs.sendMessage(message.tabId, { type: 'BT_RECONFIGURE' });
+      } else await chrome.tabs.sendMessage(message.tabId, { type: 'BT_RECONFIGURE', reason: 'manual' });
       return { ok: true };
     }
     return { ok: false, error: '未知的控制指令。' };
@@ -202,7 +232,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
+// Chrome also reports history.pushState/replaceState and back/forward URL
+// changes here. Hash-only article anchors keep the same translation session.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (typeof changeInfo.url !== 'string') return;
+  const nextUrl = pageUrl(changeInfo.url);
+  if (tabPages.get(tabId) === nextUrl) return;
+  tabPages.set(tabId, nextUrl);
+  const revision = (navigationRevisions.get(tabId) || 0) + 1;
+  navigationRevisions.set(tabId, revision);
+  void sessionFor(tabId).then(async previous => {
+    // A storage read for an earlier route can finish after a later session was
+    // created (A → B → A). Never cancel that latest session from an old event.
+    if (navigationRevisions.get(tabId) !== revision || tabPages.get(tabId) !== nextUrl ||
+        !previous || previous.pageUrl === nextUrl) return;
+    await cancelSession(previous);
+    if ((await sessionFor(tabId))?.id === previous.id) await chrome.storage.session.remove(sessionKey(tabId));
+  }).catch(() => {});
+  if (nextUrl) void chrome.tabs.sendMessage(tabId, { type: 'BT_RECONFIGURE', reason: 'navigation', pageUrl: nextUrl }).catch(() => {});
+});
+
 chrome.tabs.onRemoved.addListener(tabId => {
+  tabPages.delete(tabId);
+  navigationRevisions.delete(tabId);
   sessionFor(tabId).then(cancelSession).catch(() => {});
   chrome.storage.session.remove([sessionKey(tabId), stateKey(tabId)]).catch(() => {});
 });

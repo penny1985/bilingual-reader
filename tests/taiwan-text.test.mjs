@@ -46,6 +46,19 @@ test('keeps other official space-agency names and ambiguous aerospace words', ()
   assert.equal(toTaiwanTraditional('航空航天領域的質量守恆與粒子質量。'), '航空航天領域的質量守恆與粒子質量。');
 });
 
+test('uses Taiwan astronaut terminology without rewriting formal organization names', () => {
+  assert.equal(toTaiwanTraditional('宇航员和航天员在太空站工作。'), '太空人和太空人在太空站工作。');
+  assert.equal(toTaiwanTraditional('宇航員訓練與航天員的生活。'), '太空人訓練與太空人的生活。');
+  const names = '「中國宇航員中心」、「中國航天員科研訓練中心」、中國人民解放軍航天員大隊、宇航員協會。';
+  assert.equal(toTaiwanTraditional(names), names);
+  assert.equal(
+    toTaiwanTraditional('「中国宇航员中心」、「中国航天员科研训练中心」、中国人民解放军航天员大队、宇航员协会。'),
+    names,
+  );
+  assert.equal(toTaiwanTraditional('宇航員中心的宇航員。'), '宇航員中心的太空人。');
+  assert.equal(toTaiwanTraditional('宇航员 `宇航员` https://example.com/宇航员。'), '太空人 `宇航员` https://example.com/宇航员。');
+});
+
 test('keeps human intellectual-ability terms and still converts artificial intelligence', () => {
   const expected = '智能障礙、智能不足、智能測驗、智能商數。人工智慧、智慧手機、人工智慧測驗。';
   assert.equal(toTaiwanTraditional('智能障礙、智能不足、智能測驗、智能商數。人工智能、智能手機、人工智能測驗。'), expected);
@@ -84,6 +97,12 @@ test('uses 品質 only for specific quality collocations and keeps physical mass
   );
   assert.equal(toTaiwanTraditional('物理學的質量與重量不同。'), '物理學的質量與重量不同。');
   assert.equal(toTaiwanTraditional('产品质量是一千克，物理质量守恒。'), '產品質量是一千克，物理質量守恆。');
+  assert.equal(toTaiwanTraditional('人工智能提高了工作质量。'), '人工智慧提高了工作品質。');
+  assert.equal(
+    toTaiwanTraditional('工作质量、生活质量、教育质量、教学质量、影像质量、影片质量、音讯质量。'),
+    '工作品質、生活品質、教育品質、教學品質、影像品質、影片品質、音訊品質。',
+  );
+  assert.equal(toTaiwanTraditional('粒子质量为1/3kg，产品质量为5kg。'), '粒子質量為1/3kg，產品質量為5kg。');
 });
 
 test('keeps existing Taiwan prose, numbers, dates, and negation', () => {
@@ -131,6 +150,54 @@ test('normalizes Chinese slash lists instead of mistaking them for paths', () =>
   assert.equal(toTaiwanTraditional('软件/硬件、数据/信息都需要更新。'), '軟體/硬體、資料/資訊都需要更新。');
   assert.equal(toTaiwanTraditional('你可以选择输入/输出的数据。'), '你可以選擇輸入/輸出的資料。');
   assert.equal(toTaiwanTraditional('请读取 /软件/用户 数据。'), '請讀取 /软件/用户 資料。');
+});
+
+test('normalizes numeric slash prose without mistaking fractions and dates for paths', () => {
+  const cases = [
+    ['大约1/3用户使用软件。', '大約1/3使用者使用軟體。'],
+    ['大約1/3用戶使用軟件。', '大約1/3使用者使用軟體。'],
+    ['2026/10软件用户数据。', '2026/10軟體使用者資料。'],
+    ['2026/10/20软件用户数据。', '2026/10/20軟體使用者資料。'],
+    ['用户2/软件3/数据4。', '使用者2/軟體3/資料4。'],
+    ['输入1/输出2的数据。', '輸入1/輸出2的資料。'],
+    ['质量为1/3kg，软件信息。', '質量為1/3kg，軟體資訊。'],
+    ['质量为1/3kg的软件信息。', '質量為1/3kg的軟體資訊。'],
+    ['数值为1/kg，需要软件处理。', '數值為1/kg，需要軟體處理。'],
+    ['大约1 /3用户使用软件。', '大約1 /3使用者使用軟體。'],
+    ['大约1 / 3用户使用软件。', '大約1 / 3使用者使用軟體。'],
+    ['数值为5/10m的数据。', '數值為5/10m的資料。'],
+  ];
+  for (const [input, expected] of cases) {
+    assert.equal(toTaiwanTraditional(input), expected, input);
+    assert.equal(toTaiwanTraditional(expected), expected, `Idempotence: ${input}`);
+  }
+});
+
+test('keeps actual relative paths while converting nearby dates and ratios', () => {
+  for (const path of ['docs/软件/用户', '软件/assets/图片', '用户2/docs/信息', '软件/用户.json', 'v1/kg/用户', '2026/10/用户.json']) {
+    const input = `大约1/3用户读取 ${path}，2026/10更新软件。`;
+    const expected = `大約1/3使用者讀取 ${path}，2026/10更新軟體。`;
+    assert.equal(toTaiwanTraditional(input), expected, path);
+    assert.equal(toTaiwanTraditional(expected), expected, `Idempotence: ${path}`);
+  }
+});
+
+test('normalizes acronym slash alternatives beside Chinese prose instead of treating them as paths', () => {
+  for (const [input, expected] of [
+    ['CPU/GPU软件性能。', 'CPU/GPU軟體效能。'],
+    ['CPUs/GPUs软件性能。', 'CPUs/GPUs軟體效能。'],
+    ['Q3/Q4用户数据。', 'Q3/Q4使用者資料。'],
+    ['RGB/颜色空间。', 'RGB/顏色空間。'],
+    ['A/B测试使用软件。', 'A/B測試使用軟體。'],
+    ['API/SDK用户数据。', 'API/SDK使用者資料。'],
+    ['GPU/CPU/用户数据。', 'GPU/CPU/使用者資料。'],
+  ]) {
+    assert.equal(toTaiwanTraditional(input), expected, input);
+    assert.equal(toTaiwanTraditional(expected), expected, `Idempotence: ${input}`);
+  }
+  for (const literal of ['CPU/软件/用户.json', '/CPU/软件/用户', './CPU/软件/用户', '`CPU/软件/用户`', 'CPU/docs/软件/用户']) {
+    assert.equal(toTaiwanTraditional(`软件 ${literal} 数据。`), `軟體 ${literal} 資料。`, literal);
+  }
 });
 
 test('converts Markdown labels and preserves absolute, relative, escaped and reference destinations', () => {

@@ -1,9 +1,9 @@
 {
-  "version": "3.0.4",
+  "version": "3.0.5",
   "date": "2026-10-20",
   "allBrowserTestsHeadless": false,
   "unit": {
-    "passed": 46,
+    "passed": 64,
     "command": "npm test"
   },
   "cloudIntegration": {
@@ -224,7 +224,7 @@
     "normalization": "Offline OpenCC Taiwan dictionaries plus US-scoped NASA alias normalization",
     "nasaCanonicalName": "美國國家航空暨太空總署",
     "newUnitTests": 5,
-    "normalizerTestsPassed": 18,
+    "normalizerTestsPassed": 22,
     "checks": [
       "Simplified and Traditional NASA aliases normalize consistently",
       "Official China agency names remain unchanged",
@@ -239,6 +239,66 @@
     "actualTranslationsChecked": 41,
     "manualReview": "All 41 actual source/translation pairs inspected; no obvious Simplified characters or Mainland regional vocabulary found in this article.",
     "knownVocabularyLeaks": 0,
-    "nasaCanonicalMentions": 3
+    "nasaCanonicalMentions": 3,
+    "latestRulesVersion": "3.0.5",
+    "newUnitTestsIn305": 4,
+    "articleEvidenceVersion": "3.0.4"
+  },
+  "reliabilityAudit": {
+    "date": "2026-10-20",
+    "productionVersion": "3.0.5",
+    "newNavigationUnitTests": 14,
+    "perUseNormalizationVerified": [
+      "Every new cloud translation is normalized before caching",
+      "Every Chrome local zh-Hant translation is normalized before caching",
+      "Cache hits use previously normalized output"
+    ],
+    "normalizationRegressions": [
+      "Numeric fraction and date prose is not treated as file paths",
+      "Uppercase slash abbreviations CPU/GPU Q3/Q4 RGB and A/B do not protect adjacent Chinese prose",
+      "Taiwan astronaut and specific quality compounds; scientific mass and named organizations retained"
+    ],
+    "actualBrowser": {
+      "headless": true,
+      "freshIsolatedProfile": true,
+      "passedChecks": 8,
+      "checks": [
+        "Actual production extension starts in a fresh profile with only storage/offscreen permissions",
+        "Real Chrome history.pushState emits tabs.onUpdated and creates a translated new-route session",
+        "Real Chrome history.replaceState with query changes creates a translated new-route session",
+        "Hash-only article navigation retains the same session and its translation",
+        "Real Chrome history.back/popstate returns to an automatically translated session",
+        "A real initially empty document automatically starts after delayed English content arrives",
+        "A real html lang change restarts automatic reading without a reload",
+        "Chrome keeps MessageSender.url at the original document; browser-verified claimed routes work without relaxing session validation or making external AI fetches"
+      ],
+      "translationResponses": "Local deterministic Response stubs; not a new Gemini translation-quality benchmark",
+      "externalAiRequests": 0
+    },
+    "demo": {
+      "interactiveChecksPassed": 13,
+      "viewportWidths": [
+        1280,
+        768,
+        375,
+        320
+      ],
+      "externalRequests": 0,
+      "sourceComparisonDate": "2026-10-19",
+      "sourceComparisonCases": 6,
+      "sourceArticleVersion": "3.0.4",
+      "sourceArticleDate": "2026-10-20",
+      "currentNormalizerApplied": true
+    },
+    "installedVersionVerified": "3.0.5",
+    "foregroundWindowActivated": false,
+    "apiKeysPublished": false,
+    "remainingLimits": [
+      "No universal semantic accuracy guarantee",
+      "Mixed-language pages with zh-Hant HTML may require website source override",
+      "Manual retry restarts all page records and memory cache may expire",
+      "Frequently changing source text may consume superseded requests",
+      "Free-tier rate and daily quotas are external service limits"
+    ]
   }
 }
